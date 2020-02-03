@@ -1,0 +1,17 @@
+使用说明：
+
+一、部署：
+1.运行环境：python3，musql
+2.python包：scrapy，pymysql, pandas
+3.导入数据库：sql文件在/coronavirus/sql下，数据库名：dataworks
+3.修改配置：(待整合)
+	数据库配置：pipelines.py、alibaba.py 
+	路径配置：alibaba.py 
+
+二、运行：
+1.获取数据：
+	因原网站有较复杂的反爬虫机制尚未解决，故目前需要如下的手动操作：
+	① 用chrome进入网站：https://alihealth.taobao.com/medicalhealth/influenzamap/
+	② 打开调试工具，找到Network中的“http://h5api.m.taobao.com/h5/mtop.alihealth.mdeer.pidemic.getalldiseaseinfo/1.0/”
+	③ 在新标签页打开，按control+s以json格式保存至/coronavirus/json/alibaba/中，并按日期命名
+2.运行：用命令行输入：python3 main.py 即可
