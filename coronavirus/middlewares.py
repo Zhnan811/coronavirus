@@ -6,6 +6,7 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from selenium import webdriver
 
 
 class CoronavirusSpiderMiddleware(object):
@@ -78,7 +79,14 @@ class CoronavirusDownloaderMiddleware(object):
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+        print('process_request')
+        content = self.selenium_request(request.url);
+        print(content)
+        if content.strip() != '':
+            return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)
         return None
+
+        return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
@@ -101,3 +109,48 @@ class CoronavirusDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+    # selenium获取页面浏览器内容
+    def selenium_request(self, url):
+        # js控制浏览器滚动到底部js
+        js = """
+        function scrollToBottom() {
+            var Height = document.body.clientHeight,  //文本高度
+                screenHeight = window.innerHeight,  //屏幕高度
+                INTERVAL = 100,  // 滚动动作之间的间隔时间
+                delta = 500,  //每次滚动距离
+                curScrollTop = 0;   //当前window.scrollTop 值
+            console.info(Height)
+            var scroll = function () {
+                //curScrollTop = document.body.scrollTop;
+                curScrollTop = curScrollTop + delta;
+                window.scrollTo(0,curScrollTop);
+                console.info("偏移量:"+delta)
+                console.info("当前位置:"+curScrollTop)
+            };
+            var timer = setInterval(function () {
+                var curHeight = curScrollTop + screenHeight;
+                if (curHeight >= Height){   //滚动到页面底部时，结束滚动
+                    clearInterval(timer);
+                }
+                scroll();
+            }, INTERVAL)
+        };
+        scrollToBottom()
+        """
+        chrome_options = webdriver.ChromeOptions()
+        # headless无界面模式
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        driver = webdriver.Chrome(chrome_options=chrome_options,executable_path="/Users/Bable/Documents/chromedriver")
+        driver.get(url)
+        # driver.maximize_window();# 窗口最大化
+        # 执行js滚动浏览器窗口到底部
+        driver.execute_script(js)
+        # time.sleep(5)  # 不加载图片的话，这个时间可以不要，等待JS执行
+        # driver.get_screenshot_as_file("C:\\Users\\Administrator\\Desktop\\test.png")
+        content = driver.page_source.encode('utf-8')
+        # driver.quit()
+        driver.close()
+        # return None
