@@ -8,7 +8,7 @@ import pymysql
 import pandas as pd
 
 # 统计计算
-import analysis
+# import analysis
 
 # 爬虫目标网页地址：https://alihealth.taobao.com/medicalhealth/influenzamap/
 
@@ -33,6 +33,7 @@ class AlibabaSpider(scrapy.Spider):
 
 	allLocationDatas = []
 	allLocationDatas_matrix = None
+
 
 	# 主程序
 	def parse(self, response):
@@ -235,7 +236,7 @@ class AlibabaSpider(scrapy.Spider):
 
 
 		# 执行增长率统计
-		analysis.calculateGrowthRates(True)
+		# analysis.calculateGrowthRates(True)
 
 		# 关闭数据库连接
 		AlibabaSpider.cursor.close()
